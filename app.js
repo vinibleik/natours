@@ -1,18 +1,30 @@
-const { readFileSync } = require("fs");
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
-const { join } = require("path");
+const morgan = require("morgan");
+
+const tourRouter = require("./routes/tourRoutes");
+const userRouter = require("./routes/userRoutes");
 
 const app = express();
 
-const tours = JSON.parse(
-    readFileSync(join(__dirname, "/dev-data/data/tours-simple.json")),
-);
+if (process.env.NODE_ENV === "production") {
+    const logPath = path.join(__dirname, "logs");
+    // const logStream = fs.createWriteStream(
+    //     path.join(logPath, `${new Date().toISOString()}.log`),
+    //     { flags: "a" },
+    // );
+    //
+    const logStream = fs.createWriteStream(path.join(logPath, "access.log"), {
+        flags: "a",
+    });
+    app.use(morgan("combined", { stream: logStream }));
+}
 
-app.get("/api/v1/tours", (req, res) => {
-    res.json({ status: "success", results: tours.length, data: { tours } });
-});
+app.use(express.json());
+app.use(express.static("public"));
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log("Listening on port ", PORT);
-});
+app.use("/api/v1/tours", tourRouter);
+app.use("/api/v1/users", userRouter);
+
+module.exports = app;

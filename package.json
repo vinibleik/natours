@@ -4,15 +4,20 @@
     "description": "Learning NodeJS, Express and MongoDB",
     "main": "app.js",
     "scripts": {
-        "start": "nodemon app.js",
+        "start": "nodemon server.js",
+        "prod": "NODE_ENV=production nodemon server.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Vinicius de Carvalho Baggio",
     "license": "ISC",
     "dependencies": {
-        "express": "^4.18.2"
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "mongoose": "^7.5.2",
+        "morgan": "^1.10.0"
     },
     "devDependencies": {
+        "eslint": "^8.50.0",
         "nodemon": "^3.0.1"
     }
 }
