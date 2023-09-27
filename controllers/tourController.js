@@ -102,10 +102,21 @@ const deleteTour = async (req, res) => {
     }
 };
 
+const aliasTopTours = (req, _res, next) => {
+    req.query = {
+        limit: "5",
+        sort: "-ratingsAverage,price",
+        fields: "name,price,ratingsAverage,summary,difficulty",
+    };
+
+    next();
+};
+
 module.exports = {
     getAllTours,
     getTour,
     createTour,
     updateTour,
     deleteTour,
+    aliasTopTours,
 };
