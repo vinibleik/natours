@@ -1,19 +1,27 @@
+const parseFilterQuery = require("../helpers/parseQueryFilter");
 const Tour = require("../models/tourModel");
 
 /**
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
  * */
-const getAllTours = async (_req, res) => {
+const getAllTours = async (req, res) => {
     try {
-        const tours = await Tour.find();
+        const queryFind = parseFilterQuery(Tour, req.query);
+        let query = Tour.find(queryFind);
+
+        const sort = req.query.sort || "createdAt";
+        query = query.sort(sort.replaceAll(",", " "));
+
+        const tours = await query.exec();
+
         return res.status(200).json({
             status: "success",
             results: tours.length,
             data: { tours },
         });
     } catch (error) {
-        return res.staus(400).json({ status: "fail", message: error });
+        return res.status(400).json({ status: "fail", message: error });
     }
 };
 
