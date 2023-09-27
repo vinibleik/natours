@@ -10,8 +10,23 @@ const getAllTours = async (req, res) => {
         const queryFind = parseFilterQuery(Tour, req.query);
         let query = Tour.find(queryFind);
 
-        const sort = req.query.sort || "createdAt";
+        const sort = req.query.sort || "-createdAt";
         query = query.sort(sort.replaceAll(",", " "));
+
+        const fields = req.query.fields || "-__v";
+        query = query.select(fields.replaceAll(",", " "));
+
+        const page = req.query.page * 1 || 1;
+        const limit = req.query.limit * 1 || 100;
+        const skip = (page - 1) * limit;
+        query = query.skip(skip).limit(limit);
+
+        if (req.query.page) {
+            const total = await Tour.countDocuments();
+            if (skip >= total) {
+                throw new Error("This page does not exist");
+            }
+        }
 
         const tours = await query.exec();
 
