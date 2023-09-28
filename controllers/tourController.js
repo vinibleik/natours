@@ -1,5 +1,5 @@
-const parseFilterQuery = require("../helpers/parseQueryFilter");
 const Tour = require("../models/tourModel");
+const apiFeatures = require("../helpers/apiFeatures");
 
 /**
  * @param {IncomingMessage} req
@@ -7,28 +7,7 @@ const Tour = require("../models/tourModel");
  * */
 const getAllTours = async (req, res) => {
     try {
-        const queryFind = parseFilterQuery(Tour, req.query);
-        let query = Tour.find(queryFind);
-
-        const sort = req.query.sort || "-createdAt";
-        query = query.sort(sort.replaceAll(",", " "));
-
-        const fields = req.query.fields || "-__v";
-        query = query.select(fields.replaceAll(",", " "));
-
-        const page = req.query.page * 1 || 1;
-        const limit = req.query.limit * 1 || 100;
-        const skip = (page - 1) * limit;
-        query = query.skip(skip).limit(limit);
-
-        if (req.query.page) {
-            const total = await Tour.countDocuments();
-            if (skip >= total) {
-                throw new Error("This page does not exist");
-            }
-        }
-
-        const tours = await query.exec();
+        const tours = await new apiFeatures(Tour, req.query).all().exec();
 
         return res.status(200).json({
             status: "success",
@@ -36,6 +15,7 @@ const getAllTours = async (req, res) => {
             data: { tours },
         });
     } catch (error) {
+        console.log(error);
         return res.status(400).json({ status: "fail", message: error });
     }
 };
