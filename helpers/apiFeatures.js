@@ -3,7 +3,7 @@ module.exports = class {
 
     constructor(
         model,
-        queryBody,
+        queryBody = {},
         { sort = "-createdAt", fields = "-__v", page = 1, limit = 100 } = {},
     ) {
         this.model = model;
@@ -54,6 +54,11 @@ module.exports = class {
 
     filter() {
         this.#query = this.#query.find(this.#parseFilterQuery());
+        return this;
+    }
+
+    findById(id) {
+        this.#query = this.model.findById(id);
         return this;
     }
 
