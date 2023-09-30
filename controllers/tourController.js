@@ -62,7 +62,7 @@ const updateTour = async (req, res) => {
                 new: true,
                 runValidators: true,
             },
-        );
+        ).exec();
         return res
             .status(200)
             .json({ status: "success", data: { updatedTour } });
@@ -77,10 +77,8 @@ const updateTour = async (req, res) => {
  * */
 const deleteTour = async (req, res) => {
     try {
-        const deletedTour = await Tour.findByIdAndDelete(req.params.id);
-        return res
-            .status(200)
-            .json({ status: "success", data: { deletedTour } });
+        await Tour.findByIdAndDelete(req.params.id).exec();
+        return res.status(200).json({ status: "success" });
     } catch (error) {
         return res.status(400).json({ status: "fail", message: error });
     }
