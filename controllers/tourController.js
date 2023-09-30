@@ -60,6 +60,7 @@ const updateTour = async (req, res) => {
             req.body,
             {
                 new: true,
+                runValidators: true,
             },
         );
         return res
