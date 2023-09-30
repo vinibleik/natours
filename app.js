@@ -27,4 +27,11 @@ app.use(express.static("public"));
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 
+app.all("*", (req, res) => {
+    return res.status(404).json({
+        status: "fail",
+        message: `Can't find ${req.originalUrl} on this server!`,
+    });
+});
+
 module.exports = app;
