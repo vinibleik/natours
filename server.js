@@ -1,3 +1,12 @@
+// Handle uncaught exceptions
+process.on("uncaughtException", (err) => {
+    console.error("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+    console.error(err);
+    server.close(() => {
+        process.exit(1);
+    });
+});
+
 require("dotenv").config(); // Configure the env before to use...
 require("./helpers/connectDB")(); // Connect to the DB
 
