@@ -5,7 +5,7 @@ const app = require("./app");
 
 let PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log("Listening on port ", PORT);
     // console.log(app._router);
     // app._router.stack.forEach((e) => {
@@ -16,4 +16,13 @@ app.listen(PORT, () => {
     //         });
     //     }
     // });
+});
+
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (err) => {
+    console.error("UNHANDLED REJECTION! 💥 Shutting down...");
+    console.error(err);
+    server.close(() => {
+        process.exit(1);
+    });
 });

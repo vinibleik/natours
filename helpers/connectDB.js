@@ -23,8 +23,7 @@ const connectDB = async () => {
             `MongoDB connected: ${conn.connection.host}/${conn.connection.name}`,
         );
     } catch (error) {
-        console.error(`DB connection Error: ${error}`);
-        process.exit(1);
+        process.emit("unhandledRejection", error);
     }
 };
 
