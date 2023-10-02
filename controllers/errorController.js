@@ -1,3 +1,12 @@
+const ApiError = require("../helpers/apiError");
+
+const DBErrorHandlers = {
+    CastError: (err) => {
+        const message = `Invalid ${err.path}: ${err.value}.`;
+        return new ApiError(message, 400);
+    },
+};
+
 const sendErrorDev = (err, res) => {
     return res.status(err.statusCode).json({
         status: err.status,
@@ -31,7 +40,9 @@ const globalErrorHandler = (err, _req, res, _next) => {
     if (process.env.NODE_ENV === "development") {
         return sendErrorDev(err, res);
     } else if (process.env.NODE_ENV === "production") {
-        return sendErrorProd(err, res);
+        let error = DBErrorHandlers[err.name]?.(err) ?? err;
+
+        return sendErrorProd(error, res);
     }
 };
 
