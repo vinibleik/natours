@@ -1,9 +1,25 @@
 const ApiError = require("../helpers/apiError");
 
 const DBErrorHandlers = {
+    // Mongoose CastError (invalid ObjectId)
     CastError: (err) => {
         const message = `Invalid ${err.path}: ${err.value}.`;
         return new ApiError(message, 400);
+    },
+
+    // Mongoose ValidationError
+    ValidationError: (err) => {
+        return new ApiError(err.message, 400);
+    },
+
+    // MongoError (duplicate key)
+    MongoServerError: (err) => {
+        if (err.code === 11000) {
+            const message = `Duplicate field value: ${err.keyValue.name}. Please use another value!`;
+            return new ApiError(message, 400);
+        }
+
+        return err;
     },
 };
 
