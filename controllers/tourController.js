@@ -1,62 +1,7 @@
 const Tour = require("../models/tourModel");
 const apiFeatures = require("../helpers/apiFeatures");
 const catchAsync = require("../helpers/catchAsync");
-
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
-const getAllTours = catchAsync(async (req, res, next) => {
-    const tours = await new apiFeatures(Tour, req.query).all().exec();
-
-    return res.status(200).json({
-        status: "success",
-        results: tours.length,
-        data: { tours },
-    });
-});
-
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
-const getTour = catchAsync(async (req, res, next) => {
-    const tour = await new apiFeatures(Tour)
-        .findById(req.params.id)
-        .select()
-        .exec();
-    return res.status(200).json({ status: "success", data: { tour } });
-});
-
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
-const createTour = catchAsync(async (req, res, next) => {
-    const newTour = await Tour.create(req.body);
-    return res.status(200).json({ status: "success", data: { newTour } });
-});
-
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
-const updateTour = catchAsync(async (req, res) => {
-    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-    }).exec();
-    return res.status(200).json({ status: "success", data: { updatedTour } });
-});
-
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
-const deleteTour = catchAsync(async (req, res, next) => {
-    await Tour.findByIdAndDelete(req.params.id).exec();
-    return res.status(200).json({ status: "success" });
-});
+const AppError = require("../helpers/apiError");
 
 const aliasTopTours = (req, _res, next) => {
     req.query = {
@@ -68,7 +13,64 @@ const aliasTopTours = (req, _res, next) => {
     next();
 };
 
-const getTourStats = catchAsync(async (_req, res, next) => {
+const getAllTours = catchAsync(async (req, res, _next) => {
+    const tours = await new apiFeatures(Tour, req.query).all().exec();
+
+    return res.status(200).json({
+        status: "success",
+        results: tours.length,
+        data: { tours },
+    });
+});
+
+const getTour = catchAsync(async (req, res, next) => {
+    const tour = await new apiFeatures(Tour)
+        .findById(req.params.id)
+        .select()
+        .exec();
+
+    if (!tour) {
+        return next(
+            new AppError(`No tour found with ID ${req.params.id}`, 404),
+        );
+    }
+
+    return res.status(200).json({ status: "success", data: { tour } });
+});
+
+const createTour = catchAsync(async (req, res, _next) => {
+    const newTour = await Tour.create(req.body);
+    return res.status(200).json({ status: "success", data: { newTour } });
+});
+
+const updateTour = catchAsync(async (req, res, next) => {
+    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+    }).exec();
+
+    if (!updatedTour) {
+        return next(
+            new AppError(`No tour found with ID ${req.params.id}`, 404),
+        );
+    }
+
+    return res.status(200).json({ status: "success", data: { updatedTour } });
+});
+
+const deleteTour = catchAsync(async (req, res, next) => {
+    const tour = await Tour.findByIdAndDelete(req.params.id).exec();
+
+    if (!tour) {
+        return next(
+            new AppError(`No tour found with ID ${req.params.id}`, 404),
+        );
+    }
+
+    return res.status(200).json({ status: "success" });
+});
+
+const getTourStats = catchAsync(async (_req, res, _next) => {
     const status = await Tour.aggregate([
         {
             $match: { ratingsAverage: { $gte: 4.5 } },
@@ -92,7 +94,7 @@ const getTourStats = catchAsync(async (_req, res, next) => {
     return res.status(200).json({ status: "success", data: { status } });
 });
 
-const getMonthlyTours = catchAsync(async (req, res, next) => {
+const getMonthlyTours = catchAsync(async (req, res, _next) => {
     const year = req.params.year * 1;
 
     const status = await Tour.aggregate([

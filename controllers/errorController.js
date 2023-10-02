@@ -1,4 +1,4 @@
-module.exports = (err, _req, res, next) => {
+const errorHandler = (err, _req, res, _next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";
 
@@ -7,3 +7,5 @@ module.exports = (err, _req, res, next) => {
         message: err.message,
     });
 };
+
+module.exports = errorHandler;

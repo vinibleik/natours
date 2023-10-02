@@ -6,11 +6,14 @@
         "node": true
     },
     "extends": "eslint:recommended",
-    "overrides": [
-    ],
+    "overrides": [],
     "parserOptions": {
         "ecmaVersion": "latest"
     },
     "rules": {
+        "no-unused-vars": [
+            "error",
+            { "vars": "all", "argsIgnorePattern": "(req|res|next|val)" }
+        ]
     }
 }

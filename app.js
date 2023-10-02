@@ -7,7 +7,7 @@ const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 
 const ApiError = require("./helpers/apiError");
-const errorController = require("./controllers/errorController");
+const globalErrorController = require("./controllers/errorController");
 
 const app = express();
 
@@ -34,6 +34,6 @@ app.all("*", (req, _res, next) => {
     next(new ApiError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-app.use(errorController);
+app.use(globalErrorController);
 
 module.exports = app;
