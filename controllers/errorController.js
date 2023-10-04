@@ -1,6 +1,6 @@
 const ApiError = require("../helpers/apiError");
 
-const DBErrorHandlers = {
+const ErrorHandlers = {
     // Mongoose CastError (invalid ObjectId)
     CastError: (err) => {
         const message = `Invalid ${err.path}: ${err.value}.`;
@@ -21,6 +21,10 @@ const DBErrorHandlers = {
 
         return err;
     },
+
+    // JsonWebToken Errors
+    JsonWebTokenError: (_err) => new ApiError("Invalid token!", 401),
+    TokenExpiredError: (_err) => new ApiError("Token expired!", 401),
 };
 
 const sendErrorDev = (err, res) => {
@@ -56,8 +60,7 @@ const globalErrorHandler = (err, _req, res, _next) => {
     if (process.env.NODE_ENV === "development") {
         return sendErrorDev(err, res);
     } else if (process.env.NODE_ENV === "production") {
-        let error = DBErrorHandlers[err.name]?.(err) ?? err;
-
+        let error = ErrorHandlers[err.name]?.(err) ?? err;
         return sendErrorProd(error, res);
     }
 };

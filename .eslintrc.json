@@ -13,7 +13,7 @@
     "rules": {
         "no-unused-vars": [
             "error",
-            { "vars": "all", "argsIgnorePattern": "(req|res|next|val)" }
+            { "vars": "all", "argsIgnorePattern": "(^_|req|res|next|val)" }
         ]
     }
 }
