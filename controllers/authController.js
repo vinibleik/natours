@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const ApiError = require("../helpers/apiError");
 const catchAsync = require("../helpers/catchAsync");
 const apiJWT = require("../helpers/apiJWT");
+const sendEmail = require("../helpers/email");
 
 const signup = catchAsync(async (req, res, next) => {
     const user = await User.create({
@@ -109,7 +110,34 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     const resetToken = user.newPasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
-    return res.status(200).json({ status: "success", resetToken });
+    const resetURL = `${req.protocol}://${req.hostname}/api/v1/users/reset-password/${resetToken}`;
+
+    const message = `Forgot your password? Submit a PATCH request with your new
+password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password,
+please ignore this email!`;
+
+    try {
+        await sendEmail({
+            to: user.email,
+            subject: "Your password reset token (valid for 10 min)",
+            text: message,
+        });
+
+        return res
+            .status(200)
+            .json({ status: "success", message: "Token sent to email!" });
+    } catch (err) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        return next(
+            new ApiError(
+                "There was an error sending the email. Try again later!",
+                500,
+            ),
+        );
+    }
 });
 
 const resetPassword = () => {};
