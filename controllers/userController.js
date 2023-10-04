@@ -1,18 +1,18 @@
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
-const getAllUsers = (_req, res) => {
-    res.status(500).json({
-        status: "error",
-        message: "This route is not yet defined",
-    });
-};
+const User = require("../models/userModel");
+const catchAsync = require("../helpers/catchAsync");
 
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- */
+const getAllUsers = catchAsync(async (req, res, next) => {
+    const users = await User.find().exec();
+
+    return res.status(200).json({
+        status: "success",
+        results: users.length,
+        data: {
+            users,
+        },
+    });
+});
+
 const createUser = (_req, res) => {
     res.status(500).json({
         status: "error",
@@ -20,10 +20,6 @@ const createUser = (_req, res) => {
     });
 };
 
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
 const getUser = (_req, res) => {
     res.status(500).json({
         status: "error",
@@ -31,10 +27,6 @@ const getUser = (_req, res) => {
     });
 };
 
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
 const updateUser = (_req, res) => {
     res.status(500).json({
         status: "error",
@@ -42,10 +34,6 @@ const updateUser = (_req, res) => {
     });
 };
 
-/**
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * */
 const deleteUser = (_req, res) => {
     res.status(500).json({
         status: "error",
