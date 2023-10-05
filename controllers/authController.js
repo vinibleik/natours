@@ -157,6 +157,24 @@ const resetPassword = catchAsync(async (req, res, next) => {
     });
 });
 
+const updatePassword = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select("+password").exec();
+    const { curPassword, newPassword, newPasswordConfirm } = req.body;
+
+    if (!(await user.checkPassword(curPassword))) {
+        return next(new ApiError("Incorrect password!", 401));
+    }
+
+    await user.resetPassword(newPassword, newPasswordConfirm);
+
+    const token = apiJWT.signJWT(user._id);
+
+    return res.status(200).json({
+        status: "success",
+        token,
+    });
+});
+
 module.exports = {
     signup,
     signin,
@@ -164,4 +182,5 @@ module.exports = {
     restricTo,
     forgotPassword,
     resetPassword,
+    updatePassword,
 };

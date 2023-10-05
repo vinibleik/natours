@@ -100,7 +100,7 @@ const userSchema = new mongoose.Schema(
                 return await this.findOne({
                     passwordResetToken: hashedToken,
                     passwordResetExpires: { $gt: Date.now() },
-                });
+                }).exec();
             },
         },
     },
