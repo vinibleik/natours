@@ -5,6 +5,15 @@ const bcrypt = require("bcrypt");
 
 const MS_10M = 10 * 60 * 1000;
 const RESET_PASS_TOKEN_LEN = 32;
+const HASH_ALG = "sha256";
+
+/**
+ * @param {string} token
+ * @returns {string} hashed token
+ * */
+const hashToken = (token) => {
+    return crypto.createHash(HASH_ALG).update(token).digest("hex");
+};
 
 const userSchema = new mongoose.Schema(
     {
@@ -70,14 +79,28 @@ const userSchema = new mongoose.Schema(
                     .randomBytes(RESET_PASS_TOKEN_LEN)
                     .toString("hex");
 
-                this.passwordResetToken = crypto
-                    .createHash("sha256")
-                    .update(resetToken)
-                    .digest("hex");
-
+                this.passwordResetToken = hashToken(resetToken);
                 this.passwordResetExpires = Date.now() + MS_10M;
 
                 return resetToken;
+            },
+            resetPassword: async function (password, passwordConfirm) {
+                this.password = password;
+                this.passwordConfirm = passwordConfirm;
+                this.passwordResetToken = undefined;
+                this.passwordResetExpires = undefined;
+
+                return await this.save();
+            },
+        },
+        statics: {
+            getUserByToken: async function (token) {
+                const hashedToken = hashToken(token);
+
+                return await this.findOne({
+                    passwordResetToken: hashedToken,
+                    passwordResetExpires: { $gt: Date.now() },
+                });
             },
         },
     },
@@ -86,6 +109,9 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
     if (this.isModified("password")) {
         this.password = await bcrypt.hash(this.password, 12);
+        if (!this.isNew) {
+            this.passwordChangedAt = Date.now() - 1000;
+        }
     }
 
     this.passwordConfirm = undefined;

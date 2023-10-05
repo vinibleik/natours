@@ -140,7 +140,22 @@ please ignore this email!`;
     }
 });
 
-const resetPassword = () => {};
+const resetPassword = catchAsync(async (req, res, next) => {
+    const user = await User.getUserByToken(req.params.token);
+
+    if (!user) {
+        return next(new ApiError("Token is invalid or has expired!", 400));
+    }
+
+    await user.resetPassword(req.body.password, req.body.passwordConfirm);
+
+    const token = apiJWT.signJWT(user._id);
+
+    return res.status(200).json({
+        status: "success",
+        token,
+    });
+});
 
 module.exports = {
     signup,
