@@ -1,5 +1,7 @@
 const User = require("../models/userModel");
 const catchAsync = require("../helpers/catchAsync");
+const ApiError = require("../helpers/apiError");
+const filterObj = require("../helpers/filterObj");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
     const users = await User.find().exec();
@@ -9,6 +11,30 @@ const getAllUsers = catchAsync(async (req, res, next) => {
         results: users.length,
         data: {
             users,
+        },
+    });
+});
+
+const updateMe = catchAsync(async (req, res, next) => {
+    if (req.body.password || req.body.passwordConfirm) {
+        return next(
+            new ApiError(
+                "This route is not for password updates. Please use /update-password.",
+                400,
+            ),
+        );
+    }
+
+    const filteredBody = filterObj(req.body, "name", "email");
+    const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+        new: true,
+        runValidators: true,
+    });
+
+    return res.status(200).json({
+        status: "success",
+        data: {
+            user,
         },
     });
 });
@@ -47,4 +73,5 @@ module.exports = {
     getUser,
     updateUser,
     deleteUser,
+    updateMe,
 };
