@@ -4,7 +4,41 @@ const catchAsync = require("../helpers/catchAsync");
 const apiJWT = require("../helpers/apiJWT");
 const sendEmail = require("../helpers/email");
 
-const signup = catchAsync(async (req, res, next) => {
+/**
+ * @param {import("express").Response} res
+ * @param {number} statusCode
+ * @param {import("mongoose").Document<User>} [user]
+ * @returns {import("express").Response}
+ * */
+const createAndSendToken = (res, statusCode, user) => {
+    const token = apiJWT.signJWT(user._id);
+
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() +
+                process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+        ),
+        httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === "production") {
+        cookieOptions.secure = true;
+    }
+
+    res.cookie("jwt", token, cookieOptions);
+
+    user.password = undefined;
+
+    return res.status(statusCode).json({
+        status: "success",
+        token,
+        data: {
+            user,
+        },
+    });
+};
+
+const signup = catchAsync(async (req, res, _next) => {
     const user = await User.create({
         name: req.body.name,
         email: req.body.email,
@@ -14,15 +48,7 @@ const signup = catchAsync(async (req, res, next) => {
         role: req.body.role,
     });
 
-    const token = apiJWT.signJWT(user._id);
-
-    return res.status(201).json({
-        status: "success",
-        token,
-        data: {
-            user,
-        },
-    });
+    return createAndSendToken(res, 201, user);
 });
 
 const signin = catchAsync(async (req, res, next) => {
@@ -37,12 +63,7 @@ const signin = catchAsync(async (req, res, next) => {
         return next(new ApiError("Email or password invalid!", 401));
     }
 
-    const token = apiJWT.signJWT(user._id);
-
-    res.status(200).json({
-        status: "success",
-        token,
-    });
+    return createAndSendToken(res, 200, user);
 });
 
 const protect = catchAsync(async (req, _res, next) => {
@@ -149,12 +170,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
     await user.resetPassword(req.body.password, req.body.passwordConfirm);
 
-    const token = apiJWT.signJWT(user._id);
-
-    return res.status(200).json({
-        status: "success",
-        token,
-    });
+    return createAndSendToken(res, 200, user);
 });
 
 const updatePassword = catchAsync(async (req, res, next) => {
@@ -167,12 +183,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
 
     await user.resetPassword(newPassword, newPasswordConfirm);
 
-    const token = apiJWT.signJWT(user._id);
-
-    return res.status(200).json({
-        status: "success",
-        token,
-    });
+    return createAndSendToken(res, 200, user);
 });
 
 module.exports = {
