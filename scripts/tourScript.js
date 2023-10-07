@@ -7,10 +7,7 @@ const { join } = require("path");
 
 const getTours = async () => {
     try {
-        const pathToData = join(
-            __dirname,
-            "../dev-data/data/tours-simple.json",
-        );
+        const pathToData = join(__dirname, "../dev-data/data/tours.json");
         const tours = await readFile(pathToData, { encoding: "utf8" });
         return JSON.parse(tours);
     } catch (error) {
