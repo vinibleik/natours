@@ -24,10 +24,7 @@ const getAllTours = catchAsync(async (req, res, _next) => {
 });
 
 const getTour = catchAsync(async (req, res, next) => {
-    const tour = await new apiFeatures(Tour)
-        .findById(req.params.id)
-        .select()
-        .exec();
+    const tour = await Tour.findById(req.params.id).exec();
 
     if (!tour) {
         return next(
