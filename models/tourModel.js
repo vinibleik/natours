@@ -122,14 +122,15 @@ const tourSchema = new mongoose.Schema(
                     return Math.floor(this.duration / 7);
                 },
             },
-            reviews: {
-                ref: "Review",
-                localField: "_id",
-                foreignField: "tour",
-            },
         },
     },
 );
+
+tourSchema.virtual("reviews", {
+    ref: "Review",
+    localField: "_id",
+    foreignField: "tour",
+});
 
 tourSchema.pre("save", function (next) {
     this.slug = slugify(this.name, { lower: true });

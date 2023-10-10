@@ -3,7 +3,8 @@ const catchAsync = require("../helpers/catchAsync");
 const ApiFeatures = require("../helpers/apiFeatures");
 
 const getAllReviews = catchAsync(async (req, res, _next) => {
-    const reviews = await new ApiFeatures(Review, req.query).all().exec();
+    const filter = req.params.tourId ? { tour: req.params.tourId } : {};
+    const reviews = await new ApiFeatures(Review, filter).all().exec();
 
     return res.status(200).json({
         status: "success",
