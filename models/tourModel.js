@@ -122,6 +122,11 @@ const tourSchema = new mongoose.Schema(
                     return Math.floor(this.duration / 7);
                 },
             },
+            reviews: {
+                ref: "Review",
+                localField: "_id",
+                foreignField: "tour",
+            },
         },
     },
 );
