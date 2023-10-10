@@ -1,36 +1,36 @@
 require("dotenv").config();
 
 const { readFile } = require("fs/promises");
-const Tour = require("../models/tourModel");
+const Review = require("../models/reviewModel");
 const connectDB = require("../helpers/connectDB");
 const { join } = require("path");
 
-const getTours = async () => {
+const getReviews = async () => {
     try {
-        const pathToData = join(__dirname, "../dev-data/data/tours.json");
-        const tours = await readFile(pathToData, { encoding: "utf8" });
-        return JSON.parse(tours);
+        const pathToData = join(__dirname, "../dev-data/data/reviews.json");
+        const reviews = await readFile(pathToData, { encoding: "utf8" });
+        return JSON.parse(reviews);
     } catch (error) {
         console.error(error);
         process.exit(1);
     }
 };
 
-const importTours = async () => {
+const importReviews = async () => {
     try {
-        const tours = await getTours();
-        await Tour.create(tours);
-        console.log("Tours inserted successfully!!");
+        const reviews = await getReviews();
+        await Review.create(reviews);
+        console.log("Reviews inserted successfully!!");
     } catch (err) {
         console.error(err);
         process.exit(1);
     }
 };
 
-const deleteTours = async () => {
+const deleteReviews = async () => {
     try {
-        await Tour.deleteMany();
-        console.log("All Tours deleted!");
+        await Review.deleteMany();
+        console.log("All Reviews deleted!");
     } catch (error) {
         console.error(error);
         process.exit(1);
@@ -40,8 +40,8 @@ const deleteTours = async () => {
 const usage = () => {
     console.log(`node ${__filename} option`);
     console.log("option:");
-    console.log("\t--import -> Import all the data Tour into DB");
-    console.log("\t--delete -> Delete all the data Tour into DB");
+    console.log("\t--import -> Import all the data Review into DB");
+    console.log("\t--delete -> Delete all the data Review into DB");
 };
 
 if (require.main === module) {
@@ -56,15 +56,15 @@ if (require.main === module) {
 
         await connectDB();
         if (process.argv[2] === "--import") {
-            await importTours();
+            await importReviews();
         } else {
-            await deleteTours();
+            await deleteReviews();
         }
         process.exit(0);
     })();
 }
 
 module.exports = {
-    import: importTours,
-    delete: deleteTours,
+    import: importReviews,
+    delete: deleteReviews,
 };

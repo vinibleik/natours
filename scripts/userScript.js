@@ -1,36 +1,36 @@
 require("dotenv").config();
 
 const { readFile } = require("fs/promises");
-const Tour = require("../models/tourModel");
+const User = require("../models/userModel");
 const connectDB = require("../helpers/connectDB");
 const { join } = require("path");
 
-const getTours = async () => {
+const getUsers = async () => {
     try {
-        const pathToData = join(__dirname, "../dev-data/data/tours.json");
-        const tours = await readFile(pathToData, { encoding: "utf8" });
-        return JSON.parse(tours);
+        const pathToData = join(__dirname, "../dev-data/data/users.json");
+        const users = await readFile(pathToData, { encoding: "utf8" });
+        return JSON.parse(users);
     } catch (error) {
         console.error(error);
         process.exit(1);
     }
 };
 
-const importTours = async () => {
+const importUsers = async () => {
     try {
-        const tours = await getTours();
-        await Tour.create(tours);
-        console.log("Tours inserted successfully!!");
+        const users = await getUsers();
+        await User.create(users);
+        console.log("Users inserted successfully!!");
     } catch (err) {
         console.error(err);
         process.exit(1);
     }
 };
 
-const deleteTours = async () => {
+const deleteUsers = async () => {
     try {
-        await Tour.deleteMany();
-        console.log("All Tours deleted!");
+        await User.deleteMany();
+        console.log("All Users deleted!");
     } catch (error) {
         console.error(error);
         process.exit(1);
@@ -40,8 +40,8 @@ const deleteTours = async () => {
 const usage = () => {
     console.log(`node ${__filename} option`);
     console.log("option:");
-    console.log("\t--import -> Import all the data Tour into DB");
-    console.log("\t--delete -> Delete all the data Tour into DB");
+    console.log("\t--import -> Import all the data User into DB");
+    console.log("\t--delete -> Delete all the data User into DB");
 };
 
 if (require.main === module) {
@@ -56,15 +56,15 @@ if (require.main === module) {
 
         await connectDB();
         if (process.argv[2] === "--import") {
-            await importTours();
+            await importUsers();
         } else {
-            await deleteTours();
+            await deleteUsers();
         }
         process.exit(0);
     })();
 }
 
 module.exports = {
-    import: importTours,
-    delete: deleteTours,
+    import: importUsers,
+    delete: deleteUsers,
 };
