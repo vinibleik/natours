@@ -1,27 +1,32 @@
 const Review = require("../models/reviewModel");
-const catchAsync = require("../helpers/catchAsync");
-const ApiFeatures = require("../helpers/apiFeatures");
+const factory = require("../helpers/hadlerFactory");
 
-const getAllReviews = catchAsync(async (req, res, _next) => {
-    const filter = req.params.tourId ? { tour: req.params.tourId } : {};
-    const reviews = await new ApiFeatures(Review, filter).all().exec();
+const setTourId = (req, res, next) => {
+    if (req.params.tourId) {
+        req.query["tour"] = req.params.tourId;
+    }
 
-    return res.status(200).json({
-        status: "success",
-        results: reviews.length,
-        data: { reviews },
-    });
-});
+    next();
+};
 
-const createReview = catchAsync(async (req, res, _next) => {
+const setTourUserIds = (req, res, next) => {
     req.body.tour = req.body.tour || req.params.tourId;
     req.body.user = req.body.user || req.user.id;
+    next();
+};
 
-    const review = await Review.create(req.body);
-    return res.status(201).json({ status: "success", data: { review } });
-});
+const getAllReviews = factory.getAll(Review);
+const getReview = factory.getOne(Review, { path: "tour" });
+const createReview = factory.createOne(Review);
+const deleteReview = factory.deleteOne(Review);
+const updateReview = factory.updateOne(Review);
 
 module.exports = {
     getAllReviews,
+    getReview,
     createReview,
+    updateReview,
+    deleteReview,
+    setTourId,
+    setTourUserIds,
 };

@@ -1,24 +1,13 @@
 const User = require("../models/userModel");
 const catchAsync = require("../helpers/catchAsync");
-const ApiError = require("../helpers/apiError");
+const AppError = require("../helpers/apiError");
 const filterObj = require("../helpers/filterObj");
-
-const getAllUsers = catchAsync(async (req, res, next) => {
-    const users = await User.find().exec();
-
-    return res.status(200).json({
-        status: "success",
-        results: users.length,
-        data: {
-            users,
-        },
-    });
-});
+const factory = require("../helpers/hadlerFactory");
 
 const updateMe = catchAsync(async (req, res, next) => {
     if (req.body.password || req.body.passwordConfirm) {
         return next(
-            new ApiError(
+            new AppError(
                 "This route is not for password updates. Please use /update-password.",
                 400,
             ),
@@ -48,33 +37,11 @@ const deleteMe = catchAsync(async (req, res, _next) => {
     });
 });
 
-const createUser = (_req, res) => {
-    res.status(500).json({
-        status: "error",
-        message: "This route is not yet defined",
-    });
-};
-
-const getUser = (_req, res) => {
-    res.status(500).json({
-        status: "error",
-        message: "This route is not yet defined",
-    });
-};
-
-const updateUser = (_req, res) => {
-    res.status(500).json({
-        status: "error",
-        message: "This route is not yet defined",
-    });
-};
-
-const deleteUser = (_req, res) => {
-    res.status(500).json({
-        status: "error",
-        message: "This route is not yet defined",
-    });
-};
+const getAllUsers = factory.getAll(User);
+const getUser = factory.getOne(User);
+const createUser = factory.createOne(User);
+const updateUser = factory.updateOne(User);
+const deleteUser = factory.deleteOne(User);
 
 module.exports = {
     getAllUsers,

@@ -1,7 +1,6 @@
 const Tour = require("../models/tourModel");
-const apiFeatures = require("../helpers/apiFeatures");
 const catchAsync = require("../helpers/catchAsync");
-const AppError = require("../helpers/apiError");
+const factory = require("../helpers/hadlerFactory");
 
 const aliasTopTours = (req, _res, next) => {
     req.query = {
@@ -13,59 +12,11 @@ const aliasTopTours = (req, _res, next) => {
     next();
 };
 
-const getAllTours = catchAsync(async (req, res, _next) => {
-    const tours = await new apiFeatures(Tour, req.query).all().exec();
-
-    return res.status(200).json({
-        status: "success",
-        results: tours.length,
-        data: { tours },
-    });
-});
-
-const getTour = catchAsync(async (req, res, next) => {
-    const tour = await Tour.findById(req.params.id).populate("reviews").exec();
-
-    if (!tour) {
-        return next(
-            new AppError(`No tour found with ID ${req.params.id}`, 404),
-        );
-    }
-
-    return res.status(200).json({ status: "success", data: { tour } });
-});
-
-const createTour = catchAsync(async (req, res, _next) => {
-    const newTour = await Tour.create(req.body);
-    return res.status(201).json({ status: "success", data: { newTour } });
-});
-
-const updateTour = catchAsync(async (req, res, next) => {
-    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-    }).exec();
-
-    if (!updatedTour) {
-        return next(
-            new AppError(`No tour found with ID ${req.params.id}`, 404),
-        );
-    }
-
-    return res.status(200).json({ status: "success", data: { updatedTour } });
-});
-
-const deleteTour = catchAsync(async (req, res, next) => {
-    const tour = await Tour.findByIdAndDelete(req.params.id).exec();
-
-    if (!tour) {
-        return next(
-            new AppError(`No tour found with ID ${req.params.id}`, 404),
-        );
-    }
-
-    return res.status(204).end();
-});
+const getAllTours = factory.getAll(Tour);
+const getTour = factory.getOne(Tour, { path: "reviews" });
+const createTour = factory.createOne(Tour);
+const updateTour = factory.updateOne(Tour);
+const deleteTour = factory.deleteOne(Tour);
 
 const getTourStats = catchAsync(async (_req, res, _next) => {
     const status = await Tour.aggregate([
