@@ -4,6 +4,11 @@ const AppError = require("../helpers/apiError");
 const filterObj = require("../helpers/filterObj");
 const factory = require("../helpers/hadlerFactory");
 
+const getMe = (req, res, next) => {
+    req.params.id = req.user.id;
+    next();
+};
+
 const updateMe = catchAsync(async (req, res, next) => {
     if (req.body.password || req.body.passwordConfirm) {
         return next(
@@ -51,4 +56,5 @@ module.exports = {
     deleteUser,
     updateMe,
     deleteMe,
+    getMe,
 };

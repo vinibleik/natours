@@ -16,7 +16,7 @@ const getAll = (Model) => {
 
 const getOne = (Model, populateOptions) => {
     return catchAsync(async (req, res, next) => {
-        let query = Model.findById(req.params.id);
+        let query = Model.findById(req.params.id).select("-__v");
 
         if (populateOptions) {
             query = query.populate(populateOptions);
