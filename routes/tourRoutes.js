@@ -7,8 +7,12 @@ const reviewRouter = require("../routes/reviewRoutes");
 
 router
     .route("/")
-    .get(authController.protect, tourController.getAllTours)
-    .post(tourController.createTour);
+    .get(tourController.getAllTours)
+    .post(
+        authController.protect,
+        authController.restricTo("admin", "lead-guide"),
+        tourController.createTour,
+    );
 
 router.get(
     "/top-5-cheap",
@@ -17,12 +21,21 @@ router.get(
 );
 
 router.get("/tour-stats", tourController.getTourStats);
-router.get("/monthly-tours/:year", tourController.getMonthlyTours);
+router.get(
+    "/monthly-tours/:year",
+    authController.protect,
+    authController.restricTo("admin", "lead-guide", "guide"),
+    tourController.getMonthlyTours,
+);
 
 router
     .route("/:id")
     .get(tourController.getTour)
-    .patch(tourController.updateTour)
+    .patch(
+        authController.protect,
+        authController.restricTo("admin", "lead-guide"),
+        tourController.updateTour,
+    )
     .delete(
         authController.protect,
         authController.restricTo("admin", "lead-guide"),
