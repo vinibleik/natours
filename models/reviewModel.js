@@ -55,6 +55,16 @@ const reviewSchema = new mongoose.Schema(
     },
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
+reviewSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "user",
+        select: "name photo",
+    });
+    next();
+});
+
 reviewSchema.post("save", function (doc) {
     this.constructor.calcAverageRatings(doc.tour);
 });
@@ -63,14 +73,6 @@ reviewSchema.post(/^findOneAnd/, function (doc, next) {
     if (doc) {
         this.model.calcAverageRatings(doc.tour);
     }
-    next();
-});
-
-reviewSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "user",
-        select: "name photo",
-    });
     next();
 });
 
