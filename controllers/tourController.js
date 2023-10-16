@@ -1,6 +1,7 @@
 const Tour = require("../models/tourModel");
 const catchAsync = require("../helpers/catchAsync");
 const factory = require("../helpers/hadlerFactory");
+const ApiError = require("../helpers/apiError");
 
 const aliasTopTours = (req, _res, next) => {
     req.query = {
@@ -87,6 +88,36 @@ const getMonthlyTours = catchAsync(async (req, res, _next) => {
     return res.status(200).json({ status: "success", data: { status } });
 });
 
+const getToursWithin = catchAsync(async (req, res, next) => {
+    const { distance, center, unit } = req.params;
+
+    const [lat, long] = center.split(",");
+    const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+
+    if (!lat || !long) {
+        return next(
+            new ApiError(
+                "Wrong format! Please provide latitude and longitude as: lat,long",
+                400,
+            ),
+        );
+    }
+
+    const tours = await Tour.find({
+        startLocation: {
+            $geoWithin: {
+                $centerSphere: [[long, lat], radius],
+            },
+        },
+    });
+
+    return res.status(200).json({
+        status: "success",
+        results: tours?.length ?? 0,
+        tours,
+    });
+});
+
 module.exports = {
     getAllTours,
     getTour,
@@ -96,4 +127,5 @@ module.exports = {
     aliasTopTours,
     getTourStats,
     getMonthlyTours,
+    getToursWithin,
 };

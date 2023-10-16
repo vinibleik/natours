@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const catchAsync = require("../helpers/catchAsync");
-const AppError = require("../helpers/apiError");
+const ApiError = require("../helpers/apiError");
 const filterObj = require("../helpers/filterObj");
 const factory = require("../helpers/hadlerFactory");
 
@@ -12,7 +12,7 @@ const getMe = (req, res, next) => {
 const updateMe = catchAsync(async (req, res, next) => {
     if (req.body.password || req.body.passwordConfirm) {
         return next(
-            new AppError(
+            new ApiError(
                 "This route is not for password updates. Please use /update-password.",
                 400,
             ),

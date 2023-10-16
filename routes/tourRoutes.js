@@ -27,6 +27,10 @@ router.get(
     authController.restricTo("admin", "lead-guide", "guide"),
     tourController.getMonthlyTours,
 );
+router.get(
+    "/tours-within/:distance/:center/:unit",
+    tourController.getToursWithin,
+);
 
 router
     .route("/:id")
