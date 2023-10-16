@@ -19,7 +19,6 @@ router.get(
     tourController.aliasTopTours,
     tourController.getAllTours,
 );
-
 router.get("/tour-stats", tourController.getTourStats);
 router.get(
     "/monthly-tours/:year",
@@ -27,6 +26,7 @@ router.get(
     authController.restricTo("admin", "lead-guide", "guide"),
     tourController.getMonthlyTours,
 );
+router.get("/tours-distances/:center/:unit", tourController.getTourDistances);
 router.get(
     "/tours-within/:distance/:center/:unit",
     tourController.getToursWithin,
