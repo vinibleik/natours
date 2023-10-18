@@ -17,6 +17,12 @@ const globalErrorController = require("./controllers/errorController");
 
 const app = express();
 
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+
+// Serving static files
+app.use(express.static(path.join(__dirname, "public")));
+
 // Set security HTTP headers
 app.use(helmet());
 
@@ -57,9 +63,6 @@ app.use(
     }),
 );
 
-// Serving static files
-app.use(express.static("public"));
-
 // Limit requests from same IP
 app.use(
     "/api",
@@ -71,6 +74,12 @@ app.use(
 );
 
 // Routes
+app.get("/", (_req, res) => {
+    res.status(200).render("base", {
+        tour: "Jonas",
+    });
+});
+
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
