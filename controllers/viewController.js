@@ -10,11 +10,19 @@ const getOverview = catchAsync(async (req, res, next) => {
     });
 });
 
-const getTour = (req, res) => {
+const getTour = catchAsync(async (req, res, next) => {
+    const tour = await Tour.findOne({ slug: req.params.slug })
+        .populate({
+            path: "reviews",
+            fields: "review rating user",
+        })
+        .exec();
+
     return res.status(200).render("tour", {
-        title: "The Forest Hiker Tour",
+        title: `${tour.name} Tour`,
+        tour,
     });
-};
+});
 
 module.exports = {
     getOverview,
