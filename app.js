@@ -11,6 +11,7 @@ const hpp = require("hpp");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
+const viewRouter = require("./routes/viewRoutes");
 
 const ApiError = require("./helpers/apiError");
 const globalErrorController = require("./controllers/errorController");
@@ -74,15 +75,10 @@ app.use(
 );
 
 // Routes
-app.get("/", (_req, res) => {
-    res.status(200).render("base", {
-        tour: "Jonas",
-    });
-});
-
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/", viewRouter);
 
 app.all("*", (req, _res, next) => {
     next(new ApiError(`Can't find ${req.originalUrl} on this server!`, 404));
