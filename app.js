@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const { xss } = require("express-xss-sanitizer");
 const hpp = require("hpp");
+const cookieParser = require("cookie-parser");
 
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -41,6 +42,8 @@ if (process.env.NODE_ENV === "production") {
     app.use(morgan("combined", { stream: logStream }));
 }
 
+// Cookie parser, reading data from res.headers.cookie into req.cookies
+app.use(cookieParser());
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));
 
