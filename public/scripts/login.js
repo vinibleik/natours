@@ -9,9 +9,15 @@ async function login(email, password) {
             headers: { "Content-Type": "application/json" },
         });
         const data = await res.json();
-        console.log(data);
+
+        if (data.status == "success") {
+            window.location.href = "/";
+        } else {
+            alert(data.message);
+        }
     } catch (err) {
-        console.log("Network Error!");
+        console.error("Network Error!");
+        console.error(err);
     }
 }
 
