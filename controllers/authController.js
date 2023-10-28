@@ -4,6 +4,13 @@ const catchAsync = require("../helpers/catchAsync");
 const apiJWT = require("../helpers/apiJWT");
 const sendEmail = require("../helpers/email");
 
+const cookieOptions = {
+    expires: new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    ),
+    httpOnly: true,
+};
+
 /**
  * @param {import("express").Response} res
  * @param {number} statusCode
@@ -12,14 +19,6 @@ const sendEmail = require("../helpers/email");
  * */
 const createAndSendToken = (res, statusCode, user) => {
     const token = apiJWT.signJWT(user._id);
-
-    const cookieOptions = {
-        expires: new Date(
-            Date.now() +
-                process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
-        ),
-        httpOnly: true,
-    };
 
     if (process.env.NODE_ENV === "production") {
         cookieOptions.secure = true;
@@ -65,6 +64,11 @@ const signin = catchAsync(async (req, res, next) => {
 
     return createAndSendToken(res, 200, user);
 });
+
+const signout = (_req, res, _next) => {
+    res.clearCookie("jwt", cookieOptions);
+    return res.status(200).json({ status: "success" });
+};
 
 const protect = catchAsync(async (req, _res, next) => {
     let token = undefined;
@@ -217,6 +221,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
 module.exports = {
     signup,
     signin,
+    signout,
     protect,
     restricTo,
     forgotPassword,

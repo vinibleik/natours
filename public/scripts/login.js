@@ -1,4 +1,6 @@
-async function login(email, password) {
+import { showAlert } from "./alerts.js";
+
+export async function login(email, password) {
     try {
         const res = await fetch("/api/v1/users/signin", {
             method: "POST",
@@ -11,9 +13,12 @@ async function login(email, password) {
         const data = await res.json();
 
         if (data.status == "success") {
-            window.location.href = "/";
+            showAlert("success", "Logged in successfully!");
+            window.setTimeout(() => {
+                location.assign("/");
+            }, 500);
         } else {
-            alert(data.message);
+            showAlert("error", data.message);
         }
     } catch (err) {
         console.error("Network Error!");
@@ -21,9 +26,20 @@ async function login(email, password) {
     }
 }
 
-document.querySelector(".form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    login(email, password);
-});
+export async function logout() {
+    try {
+        const res = await fetch("/api/v1/users/signout", {
+            method: "GET",
+        });
+        const data = await res.json();
+
+        if (data.status == "success") {
+            location.reload(true);
+        } else {
+            showAlert("error", data.message);
+        }
+    } catch (err) {
+        console.error("Network Error!");
+        console.error(err);
+    }
+}

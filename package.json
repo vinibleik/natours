@@ -6,7 +6,8 @@
     "scripts": {
         "start": "nodemon server.js",
         "prod": "NODE_ENV=production nodemon server.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build": "webpack --mode=production",
+        "build:babel": "babel public/scripts --out-dir public/babel --copy-files --no-copy-ignored"
     },
     "author": "Vinicius de Carvalho Baggio",
     "license": "ISC",
@@ -29,7 +30,13 @@
         "validator": "^13.11.0"
     },
     "devDependencies": {
+        "@babel/cli": "^7.23.0",
+        "@babel/core": "^7.23.2",
+        "@babel/preset-env": "^7.23.2",
+        "babel-loader": "^9.1.3",
         "eslint": "^8.50.0",
-        "nodemon": "^3.0.1"
+        "nodemon": "^3.0.1",
+        "webpack": "^5.89.0",
+        "webpack-cli": "^5.1.4"
     }
 }
