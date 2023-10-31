@@ -1,16 +1,28 @@
 {
+    "root": true,
     "env": {
         "browser": true,
         "commonjs": true,
         "es2021": true,
         "node": true
     },
-    "extends": "eslint:recommended",
-    "overrides": [],
+    "extends": ["eslint:recommended", "prettier"],
+    "overrides": [
+        {
+            "files": ["public/**/*"],
+            "env": {
+                "browser": true
+            },
+            "rules": {
+                "no-console": "off"
+            }
+        }
+    ],
     "parserOptions": {
         "ecmaVersion": "latest"
     },
     "rules": {
+        "no-console": "warn",
         "no-unused-vars": [
             "error",
             { "vars": "all", "argsIgnorePattern": "(^_|req|res|next|val)" }

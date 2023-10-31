@@ -7,7 +7,10 @@
         "start": "nodemon server.js",
         "prod": "NODE_ENV=production nodemon server.js",
         "build": "webpack --mode=production",
-        "build:babel": "babel public/scripts --out-dir public/babel --copy-files --no-copy-ignored"
+        "build:babel": "babel public/scripts --out-dir public/babel --copy-files --no-copy-ignored",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write ."
     },
     "author": "Vinicius de Carvalho Baggio",
     "license": "ISC",
@@ -35,7 +38,9 @@
         "@babel/preset-env": "^7.23.2",
         "babel-loader": "^9.1.3",
         "eslint": "^8.50.0",
+        "eslint-config-prettier": "^9.0.0",
         "nodemon": "^3.0.1",
+        "prettier": "^3.0.3",
         "webpack": "^5.89.0",
         "webpack-cli": "^5.1.4"
     }

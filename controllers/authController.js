@@ -66,7 +66,11 @@ const signin = catchAsync(async (req, res, next) => {
 });
 
 const signout = (_req, res, _next) => {
-    res.clearCookie("jwt", cookieOptions);
+    // res.clearCookie("jwt", cookieOptions);
+    res.cookie("jwt", "", {
+        expires: new Date(Date.now() + 1000),
+        httpOnly: true,
+    });
     return res.status(200).json({ status: "success" });
 };
 
