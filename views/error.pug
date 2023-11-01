@@ -1,0 +1,9 @@
+extends base
+
+block content
+    main.main
+        .error
+            .error__title
+                h2.heading-secondary.heading-secondary--error=  `${statusCode}  `
+                h2.error_emoji=  `${status}   ¯\_(ツ)_/¯`
+            .error__msg= message

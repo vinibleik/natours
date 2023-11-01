@@ -1,5 +1,6 @@
 const Tour = require("../models/tourModel");
 const catchAsync = require("../helpers/catchAsync");
+const ApiError = require("../helpers/apiError");
 
 const getOverview = catchAsync(async (req, res, next) => {
     const tours = await Tour.find().exec();
@@ -17,6 +18,10 @@ const getTour = catchAsync(async (req, res, next) => {
             fields: "review rating user",
         })
         .exec();
+
+    if (!tour) {
+        return next(new ApiError("There is no tour with that name", 404));
+    }
 
     return res.status(200).render("tour", {
         title: `${tour.name} Tour`,
