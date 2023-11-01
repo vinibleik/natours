@@ -74,7 +74,7 @@ const signout = (_req, res, _next) => {
     return res.status(200).json({ status: "success" });
 };
 
-const protect = catchAsync(async (req, _res, next) => {
+const protect = catchAsync(async (req, res, next) => {
     let token = undefined;
 
     if (req.headers.authorization?.startsWith("Bearer")) {
@@ -111,6 +111,7 @@ const protect = catchAsync(async (req, _res, next) => {
     }
 
     req.user = user;
+    res.locals.user = user;
     next();
 });
 

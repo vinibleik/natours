@@ -1,4 +1,5 @@
 const Tour = require("../models/tourModel");
+const User = require("../models/userModel");
 const catchAsync = require("../helpers/catchAsync");
 const ApiError = require("../helpers/apiError");
 
@@ -35,8 +36,35 @@ const getLoginForm = (req, res) => {
     });
 };
 
+const getAccount = (req, res) => {
+    return res.status(200).render("account", {
+        title: "Your account",
+    });
+};
+
+const updateUser = catchAsync(async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        {
+            name: req.body.name,
+            email: req.body.email,
+        },
+        {
+            new: true,
+            runValidators: true,
+        },
+    );
+
+    return res.status(200).render("account", {
+        title: "Your account",
+        user,
+    });
+});
+
 module.exports = {
     getOverview,
     getTour,
     getLoginForm,
+    getAccount,
+    updateUser,
 };

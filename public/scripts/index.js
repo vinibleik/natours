@@ -1,6 +1,6 @@
 import { login, logout } from "./login.js";
 
-const form = document.querySelector(".form");
+const form = document.querySelector(".form--login");
 if (form) {
     form.addEventListener("submit", function (e) {
         e.preventDefault();

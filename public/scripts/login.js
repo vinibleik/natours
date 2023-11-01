@@ -34,7 +34,7 @@ export async function logout() {
         const data = await res.json();
 
         if (data.status == "success") {
-            location.reload(true);
+            location.assign("/");
         } else {
             showAlert("error", data.message);
         }

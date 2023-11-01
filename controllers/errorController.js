@@ -96,7 +96,9 @@ const sendErrorProd = (err, req, res) => {
 
     return renderErrorHandler(res, err.statusCode, {
         title: "Something went wrong!",
-        ...error,
+        message: error.message,
+        status: error.status,
+        statusCode: err.statusCode,
     });
 };
 

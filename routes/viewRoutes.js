@@ -3,10 +3,16 @@ const authController = require("../controllers/authController");
 
 const router = require("express").Router();
 
-router.use(authController.isLoggedIn);
+router.get("/", authController.isLoggedIn, viewController.getOverview);
+router.get("/tour/:slug", authController.isLoggedIn, viewController.getTour);
+router.get("/login", authController.isLoggedIn, viewController.getLoginForm);
+router.get("/me", authController.protect, viewController.getAccount);
 
-router.get("/", viewController.getOverview);
-router.get("/tour/:slug", viewController.getTour);
-router.get("/login", viewController.getLoginForm);
+router.post(
+    "/submit-user-data",
+    require("express").urlencoded({ extended: true, limit: "10kb" }),
+    authController.protect,
+    viewController.updateUser,
+);
 
 module.exports = router;
