@@ -30,7 +30,10 @@ const userSchema = new mongoose.Schema(
                 message: "Invalid email!",
             },
         },
-        photo: String,
+        photo: {
+            type: String,
+            default: "default.jpg",
+        },
         role: {
             type: String,
             enum: {
