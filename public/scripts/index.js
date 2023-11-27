@@ -25,10 +25,8 @@ if (formUpdateData) {
         btn.textContent = "Updating...";
         btn.disabled = true;
         const formData = new FormData(e.target);
-        updateData("user-data", {
-            name: formData.get("name"),
-            email: formData.get("email"),
-        }).then(() => {
+        console.log(formData);
+        updateData("user-data", formData).then(() => {
             btn.textContent = previousValue;
             btn.disabled = false;
         });

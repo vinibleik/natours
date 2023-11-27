@@ -39,7 +39,6 @@ const resizeUserPhoto = (req, _res, next) => {
     if (!req.file) {
         return next();
     }
-    console.log(req.file);
 
     req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
