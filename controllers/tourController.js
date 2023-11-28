@@ -1,3 +1,5 @@
+const multer = require("multer");
+const sharp = require("sharp");
 const Tour = require("../models/tourModel");
 const catchAsync = require("../helpers/catchAsync");
 const factory = require("../helpers/hadlerFactory");
@@ -7,6 +9,63 @@ const M_TO_MILES = 0.0006213712;
 const M_TO_KM = 0.001;
 const EARTH_RADIUS_MILES = 3963.2;
 const EARTH_RADIUS_KM = 6378.1;
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith("image")) {
+        return cb(null, true);
+    }
+    return cb(
+        new ApiError("Not an image! Please upload only images.", 400),
+        false,
+    );
+};
+
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter,
+});
+
+// const uploadTourImages = upload.array("images", 3);
+const uploadTourImages = upload.fields([
+    { name: "imageCover", maxCount: 1 },
+    { name: "images", maxCount: 3 },
+]);
+
+const resizeTourImages = catchAsync(async (req, _res, next) => {
+    if (!req.files.imageCover || !req.files.images) {
+        return next();
+    }
+
+    const imageCoverFilename = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+    await sharp(req.files.imageCover[0].buffer)
+        .resize(2000, 1333)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${imageCoverFilename}`);
+    req.body.imageCover = imageCoverFilename;
+
+    req.body.images = [];
+
+    await Promise.all(
+        req.files.images.map(async (file, index) => {
+            const filename = `tour-${req.params.id}-${Date.now()}-${
+                index + 1
+            }.jpeg`;
+
+            await sharp(file.buffer)
+                .resize(2000, 1333)
+                .toFormat("jpeg")
+                .jpeg({ quality: 90 })
+                .toFile(`public/img/tours/${filename}`);
+
+            req.body.images.push(filename);
+        }),
+    );
+
+    next();
+});
 
 const aliasTopTours = (req, _res, next) => {
     req.query = {
@@ -180,6 +239,8 @@ const getTourDistances = catchAsync(async (req, res, next) => {
 });
 
 module.exports = {
+    uploadTourImages,
+    resizeTourImages,
     getAllTours,
     getTour,
     createTour,
