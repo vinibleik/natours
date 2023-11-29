@@ -2,7 +2,7 @@ const User = require("../models/userModel");
 const ApiError = require("../helpers/apiError");
 const catchAsync = require("../helpers/catchAsync");
 const apiJWT = require("../helpers/apiJWT");
-const sendEmail = require("../helpers/email");
+const Email = require("../helpers/email");
 
 const cookieOptions = {
     expires: new Date(
@@ -46,6 +46,10 @@ const signup = catchAsync(async (req, res, _next) => {
         passwordConfirm: req.body.passwordConfirm,
         role: req.body.role,
     });
+
+    const url = `${req.protocol}://${req.get("host")}/me`;
+    const email = new Email(user, url);
+    await email.sendWelcome();
 
     return createAndSendToken(res, 201, user);
 });
@@ -171,15 +175,15 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     const resetURL = `${req.protocol}://${req.hostname}/api/v1/users/reset-password/${resetToken}`;
 
     const message = `Forgot your password? Submit a PATCH request with your new
-password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password,
-please ignore this email!`;
+    password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password,
+    please ignore this email!`;
 
     try {
-        await sendEmail({
-            to: user.email,
-            subject: "Your password reset token (valid for 10 min)",
-            text: message,
-        });
+        // await sendEmail({
+        //     to: user.email,
+        //     subject: "Your password reset token (valid for 10 min)",
+        //     text: message,
+        // });
 
         return res
             .status(200)
