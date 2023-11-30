@@ -30,7 +30,10 @@ const getCheckoutSession = catchAsync(async (req, res, next) => {
         payment_method_types: ["card"],
     });
 
-    res.redirect(303, session.url);
+    return res.json({
+        status: "success",
+        session,
+    });
 });
 
 module.exports = {

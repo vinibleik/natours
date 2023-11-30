@@ -1,5 +1,6 @@
 import { login, logout } from "./login.js";
 import { updateData } from "./update.js";
+import { bookTour } from "./stripe.js";
 
 const form = document.querySelector(".form--login");
 if (form) {
@@ -50,5 +51,14 @@ if (formUpdatePassword) {
             btn.textContent = previousValue;
             btn.disabled = false;
         });
+    });
+}
+
+const bookBtn = document.getElementById("book-tour");
+if (bookBtn) {
+    bookBtn.addEventListener("click", (e) => {
+        e.target.textContent = "Processing...";
+        const { tourId } = e.target.dataset;
+        bookTour(tourId);
     });
 }
