@@ -36,7 +36,7 @@ const parseModels = (models) => {
         review: reviewScript,
     };
 
-    if (models.includes("all")) {
+    if (models.includes("--all")) {
         return Object.values(scripts);
     }
 

@@ -35,3 +35,12 @@ process.on("unhandledRejection", (err) => {
         process.exit(1);
     });
 });
+
+// Heroku sends a SIGTERM signal to the process when it wants to shut down the dyno
+// So we need to handle this signal to close the server before the process ends
+process.on("SIGTERM", () => {
+    console.log("👋 SIGTERM RECEIVED. Shutting down gracefully");
+    server.close(() => {
+        console.log("💥 Process terminated!");
+    });
+});

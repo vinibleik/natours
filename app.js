@@ -8,6 +8,8 @@ const mongoSanitize = require("express-mongo-sanitize");
 const { xss } = require("express-xss-sanitizer");
 const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
+const compression = require("compression");
+const cors = require("cors");
 
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -19,9 +21,15 @@ const ApiError = require("./helpers/apiError");
 const globalErrorController = require("./controllers/errorController");
 
 const app = express();
+app.enable("trust proxy");
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
+
+// Implement CORS
+app.use(cors());
+// Preflight requests
+app.options("*", cors());
 
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
@@ -78,6 +86,8 @@ app.use(
         message: "Too many requests from this IP, please try again in an hour!",
     }),
 );
+
+app.use(compression());
 
 // Routes
 app.use("/api/v1/tours", tourRouter);

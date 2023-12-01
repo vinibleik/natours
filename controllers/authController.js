@@ -4,27 +4,24 @@ const catchAsync = require("../helpers/catchAsync");
 const apiJWT = require("../helpers/apiJWT");
 const Email = require("../helpers/email");
 
-const cookieOptions = {
-    expires: new Date(
-        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
-    ),
-    httpOnly: true,
-};
-
 /**
+ * @param {import("express").Request} req
  * @param {import("express").Response} res
  * @param {number} statusCode
  * @param {import("mongoose").Document<User>} [user]
  * @returns {import("express").Response}
  * */
-const createAndSendToken = (res, statusCode, user) => {
+const createAndSendToken = (req, res, statusCode, user) => {
     const token = apiJWT.signJWT(user._id);
 
-    if (process.env.NODE_ENV === "production") {
-        cookieOptions.secure = true;
-    }
-
-    res.cookie("jwt", token, cookieOptions);
+    res.cookie("jwt", token, {
+        expires: new Date(
+            Date.now() +
+                process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+        ),
+        httpOnly: true,
+        secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+    });
 
     user.password = undefined;
 
@@ -51,7 +48,7 @@ const signup = catchAsync(async (req, res, _next) => {
     const email = new Email(user, url);
     await email.sendWelcome();
 
-    return createAndSendToken(res, 201, user);
+    return createAndSendToken(req, res, 201, user);
 });
 
 const signin = catchAsync(async (req, res, next) => {
@@ -66,11 +63,10 @@ const signin = catchAsync(async (req, res, next) => {
         return next(new ApiError("Email or password invalid!", 401));
     }
 
-    return createAndSendToken(res, 200, user);
+    return createAndSendToken(req, res, 200, user);
 });
 
 const signout = (_req, res, _next) => {
-    // res.clearCookie("jwt", cookieOptions);
     res.cookie("jwt", "", {
         expires: new Date(Date.now() + 1000),
         httpOnly: true,
@@ -205,7 +201,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
     await user.resetPassword(req.body.password, req.body.passwordConfirm);
 
-    return createAndSendToken(res, 200, user);
+    return createAndSendToken(req, res, 200, user);
 });
 
 const updatePassword = catchAsync(async (req, res, next) => {
@@ -218,7 +214,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
 
     await user.resetPassword(newPassword, newPasswordConfirm);
 
-    return createAndSendToken(res, 200, user);
+    return createAndSendToken(req, res, 200, user);
 });
 
 module.exports = {

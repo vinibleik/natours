@@ -4,7 +4,8 @@
     "description": "Learning NodeJS, Express and MongoDB",
     "main": "app.js",
     "scripts": {
-        "start": "nodemon server.js",
+        "start": "webpack --mode=production && node server.js",
+        "dev": "NODE_ENV=development nodemon server.js",
         "prod": "NODE_ENV=production nodemon server.js",
         "build": "webpack --mode=production",
         "build:babel": "babel public/scripts --out-dir public/babel --copy-files --no-copy-ignored",
@@ -16,7 +17,9 @@
     "license": "ISC",
     "dependencies": {
         "bcrypt": "^5.1.1",
+        "compression": "^1.7.4",
         "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "express-mongo-sanitize": "^2.2.0",
@@ -47,5 +50,9 @@
         "prettier": "^3.0.3",
         "webpack": "^5.89.0",
         "webpack-cli": "^5.1.4"
+    },
+    "engines": {
+        "node": ">=20.0.0",
+        "npm": ">=10.0.0"
     }
 }
