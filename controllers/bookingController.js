@@ -1,6 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const Tour = require("../models/tourModel");
 const Booking = require("../models/bookingModel");
+const factory = require("../helpers/hadlerFactory.js");
 const catchAsync = require("../helpers/catchAsync");
 
 const getCheckoutSession = catchAsync(async (req, res, next) => {
@@ -51,7 +52,18 @@ const createBookingCheckout = catchAsync(async (req, res, next) => {
     return res.redirect("/");
 });
 
+const getAllBookings = factory.getAll(Booking);
+const getBooking = factory.getOne(Booking);
+const createBooking = factory.createOne(Booking);
+const updateBooking = factory.updateOne(Booking);
+const deleteBooking = factory.deleteOne(Booking);
+
 module.exports = {
     getCheckoutSession,
     createBookingCheckout,
+    getAllBookings,
+    getBooking,
+    createBooking,
+    updateBooking,
+    deleteBooking,
 };
