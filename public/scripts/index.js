@@ -1,6 +1,7 @@
 import { login, logout } from "./login.js";
 import { updateData } from "./update.js";
 import { bookTour } from "./stripe.js";
+import { showAlert } from "./alerts.js";
 
 const form = document.querySelector(".form--login");
 if (form) {
@@ -61,4 +62,9 @@ if (bookBtn) {
         const { tourId } = e.target.dataset;
         bookTour(tourId);
     });
+}
+
+const alertMessage = document.querySelector("body").dataset.alert;
+if (alertMessage) {
+    showAlert("success", alertMessage, 10);
 }

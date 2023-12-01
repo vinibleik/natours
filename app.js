@@ -16,6 +16,7 @@ const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const viewRouter = require("./routes/viewRoutes");
 const bookingRouter = require("./routes/bookingRoutes");
+const bookingController = require("./controllers/bookingController");
 
 const ApiError = require("./helpers/apiError");
 const globalErrorController = require("./controllers/errorController");
@@ -50,6 +51,12 @@ if (process.env.NODE_ENV === "production") {
     });
     app.use(morgan("combined", { stream: logStream }));
 }
+
+app.post(
+    "/webhook-checkout",
+    express.raw({ type: "application/json" }),
+    bookingController.webhookCheckout,
+);
 
 // Cookie parser, reading data from res.headers.cookie into req.cookies
 app.use(cookieParser());
